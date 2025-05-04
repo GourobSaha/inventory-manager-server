@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from 'typeorm';
+import * as argon2 from 'argon2';
 
-@Entity()
+@Entity('users')
 export class User {
     @PrimaryGeneratedColumn()
     id: number;
@@ -13,8 +14,18 @@ export class User {
 
     @Column()
     password: string;
-    // @BeforeInsert()
-    // async hashPassword() {
-    //     this.password = await bcrypt.hash(this.password, 10);
-    // }
+
+    @BeforeInsert()
+    async hashPassword() {
+        this.password = await argon2.hash(this.password);
+    }
+
+    @Column()
+    roleId: number;
+
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    createdAt: Date;
+
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    updatedAt: Date;
 }
